@@ -1,150 +1,88 @@
+# Model Compression — Threshold-Based Weight Pruning (Visual Analysis)
 
-
-Each image corresponds to a specific moment in the pruning lifecycle.
-
----
-
-# 1. Motivation
-
-Threshold pruning removes weights whose absolute value is below some value **τ**, producing a sparse model.  
-Although the concept is simple, its real impact is best understood through **visualizing weight distributions**.
-
-This repository answers:
-
-- What do weights look like at initialization?  
-- How does training reshape the distribution?  
-- How does pruning change the distribution globally and per-layer?  
-- What happens when pruning is done inside the training loop vs after training?
+This repository provides a complete visual exploration of **threshold pruning** in neural networks.  
+All plots inside `prunning/static/` show how pruning reshapes the **distribution of model weights** at different stages of training.
 
 ---
 
-# 2. Visualizations Included
+# 📁 Repository Structure
 
-Each PNG file represents a histogram of layer weights at a specific stage.
+All images below are rendered directly from:
 
----
-
-## **2.1 Initialization Distributions**
-
-Files:
-
-- `initialization-cls-head.png`
-- `initialization-ffnn.png`
-
-These show the raw weight distributions directly after model initialization.  
-Characteristics:
-
-- Symmetric around zero  
-- Typically Gaussian-like  
-- No sparsity present  
-
-Useful for confirming correct initialization behavior.
+https://github.com/ajheshbasnet/model-compression/tree/main/prunning/static
 
 ---
 
-## **2.2 Before Pruning (After Full Training)**
+# 1. Initialization Weight Distributions
 
-Files:
+## **1.1 Classification Head Initialization**
+![Initialization CLS Head](./static/initialization-cls-head.png)
 
-- `before-pruning-distribution-cls-head.png`
-- `before-pruning-distribution-ffnn.png`
+## **1.2 FFNN Initialization**
+![Initialization FFNN](./static/initialization-ffnn.png)
 
-These show weight magnitude **after training but before pruning**.
-
-Observations:
-
-- Many weights remain near zero → pruning candidates  
-- A long-tail of large-magnitude weights emerges  
-- The distribution widens relative to initialization  
-
-This stage represents the baseline model prior to compression.
+These depict the raw weight histograms immediately after model construction.
 
 ---
 
-## **2.3 Threshold Applied Inside Training Loop**
+# 2. Weight Distribution After Training (Before Pruning)
 
-Files:
+## **2.1 Classification Head — Before Pruning**
+![Before Pruning CLS Head](./static/before-pruning-distribution-cls-head.png)
 
-- `threshold-inside-the-training-loop-cls.png`
-- `threshold-inside-the-training-loop-ffnn.png`
+## **2.2 FFNN — Before Pruning**
+![Before Pruning FFNN](./static/before-pruning-distribution-ffnn.png)
 
-Pruning is applied **during training**, not afterward.
-
-Effects:
-
-- Strong spike of weights exactly at zero  
-- Training repeatedly tries to regrow some weights  
-- Clear “push-and-pull” dynamics between gradient updates and pruning  
-
-These images reveal how live pruning influences training stability.
+Shows how training reshapes magnitude distribution.
 
 ---
 
-## **2.4 Post-Training Manual Pruning (τ = 0.4)**
+# 3. Threshold Applied Inside Training Loop
 
-Files:
+## **3.1 CLS Head — Pruning During Training**
+![Threshold Inside Training Loop CLS](./static/threshold-inside-the-training-loop-cls.png)
 
-- `at-prune-0.4-cls-head.png`
-- `at-prune-0.4-ffnn.png`
+## **3.2 FFNN — Pruning During Training**
+![Threshold Inside Training Loop FFNN](./static/threshold-inside-the-training-loop-ffnn.png)
 
-This is pruning applied **after** training using a fixed threshold of 0.4.
-
-Characteristics:
-
-- A large dead-zone around zero (sparsity)
-- Only large-magnitude weights survive
-- Distribution becomes truncated and often bimodal
-
-This is the final compressed model.
+Visualizes the “live” pruning effect while gradients continue updating weights.
 
 ---
 
-# 3. What These Visuals Reveal
+# 4. Post-Training Manual Pruning (τ = 0.4)
 
-Across all phases, the transformation is:
+## **4.1 CLS Head — After Pruning (τ = 0.4)**
+![At Prune 0.4 CLS Head](./static/at-prune-0.4-cls-head.png)
+
+## **4.2 FFNN — After Pruning (τ = 0.4)**
+![At Prune 0.4 FFNN](./static/at-prune-0.4-ffnn.png)
+
+Shows how a fixed pruning threshold affects weight sparsity after full training.
+
+---
+
+# 5. Summary
+
+The full pruning lifecycle illustrated:
 
 1. **Initialization:**  
-   Uniform, symmetric, dense distribution.
+   Dense, symmetric distribution.
 
-2. **After training:**  
-   Distribution widens; low-magnitude cluster forms.
+2. **After Training:**  
+   Broader distribution with many near-zero values.
 
-3. **Pruning during training:**  
-   Zero-spike grows; distribution becomes asymmetric.
+3. **During Training Pruning:**  
+   Strong zero-spike due to repeated thresholding.
 
-4. **Post-training pruning:**  
-   Sharp cut-off at threshold; sparsity increases dramatically.
+4. **Post-Training Pruning:**  
+   Most low-magnitude weights eliminated → sparse model.
 
-These transitions help diagnose:
-
-- Under-pruning (threshold too small)  
-- Over-pruning (threshold too large)  
-- Layer-specific sensitivity  
-- Training stability under live pruning  
+These visualizations reveal pruning behavior, layer sensitivity, and sparsity formation patterns.
 
 ---
 
-# 4. Purpose of This Repository
+# 6. Directory Link
 
-The static images serve as a visual reference for:
+All raw images are stored here:
 
-- Understanding pruning behavior  
-- Teaching model compression concepts  
-- Debugging pruning strategies  
-- Comparing pruning intensities  
-- Presenting pruning effects in research or lectures  
-
----
-
-# 5. Directory Link
-
-All images are located here:
-
-**https://github.com/ajheshbasnet/model-compression/tree/main/prunning/static**
-
----
-
-# 6. License
-
-This project is released for educational and research purposes.
-
+https://github.com/ajheshbasnet/model-compression/tree/main/prunning/static
